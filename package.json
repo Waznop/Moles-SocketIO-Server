@@ -1,10 +1,17 @@
 {
   "name": "molesserver",
   "version": "1.0.0",
-  "description": "Server for Moles",
+  "description": "Server for Moles using SocketIO",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": "6.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Waznop/Moles-SocketIO-Server"
   },
   "author": "Waznop",
   "license": "MIT",

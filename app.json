@@ -1,0 +1,5 @@
+{
+	"name": "Moles Server",
+	"description": "Server for Moles using SocketIO",
+	"repository": "https://github.com/Waznop/Moles-SocketIO-Server"
+}
