@@ -2,7 +2,7 @@ var app = require("express")();
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
 
-server.listen(8080, "0.0.0.0", function() {
+server.listen(process.env.PORT || 8080, function() {
 	console.log("Server is now running...");
 });
 
