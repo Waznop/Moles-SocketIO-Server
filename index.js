@@ -32,6 +32,8 @@ var maxRocks = 15;
 var mapSize = 64;
 var mapDims = 8;
 var winningScore = 10;
+var version = "v2.0.2";
+var numPlayers = 0;
 
 // roomId to room
 var rooms = {};
@@ -95,13 +97,23 @@ function joinRoom(socket, roomId) {
 
 io.on("connect", function(socket) {
     socket.on("playerRegistered", function(data) {
+        if (! data.version || data.version !== version) {
+            socket.emit("wrongVersion");
+            socket.disconnect();
+            return;
+        }
+
     	if (! socket.name) {
     		console.log(data.name + " logged in.");
+    		numPlayers += 1;
+    		io.in("lobby").emit("playerLoggedIn", {name: data.name});
     		socket.name = data.name;
     	}
+
     	socket.level = data.level;
     	socket.join("lobby");
         socket.emit("getRooms", rooms);
+        socket.emit("getNumPlayers", {numPlayers: numPlayers});
     });
     socket.on("roomCreated", function(data) {
     	var roomId = createRoom(socket, data);
@@ -120,6 +132,9 @@ io.on("connect", function(socket) {
     	} else {
     		socket.emit("joinRoomFail");
     	}
+    });
+    socket.on("lobbyMessage", function(text) {
+        socket.broadcast.to("lobby").emit("lobbyMessage", {sender: socket.name, content: text});
     });
     socket.on("requestPlayer", function(data) {	
     	if (! players[data.roomId]) {
@@ -226,6 +241,10 @@ io.on("connect", function(socket) {
     		}
     	}
 
+    	function playerMessage(text) {
+    	    socket.broadcast.to(data.roomId + "").emit("playerMessage", {id: socket.id, msg: text});
+    	}
+
 		function quitRoom() {
 			socket.broadcast.to(data.roomId + "").emit("playerDisconnected",
 				{id: socket.id});
@@ -248,6 +267,7 @@ io.on("connect", function(socket) {
 			}
 		}
 
+        socket.on("playerMessaged", playerMessage);
     	socket.on("playerMoved", playerMove);
     	socket.on("playerPopped", playerPop);
     	socket.on("playerDigged", playerDig);
@@ -259,6 +279,7 @@ io.on("connect", function(socket) {
     		socket.removeListener("playerPopped", playerPop);
     		socket.removeListener("playerDigged", playerDig);
     		socket.removeListener("playerRespawned", playerRespawn);
+    		socket.removeListener("playerMessaged", playerMessage);
     		quitRoom();
     	});
     	socket.once("disconnect", quitRoom);
@@ -266,6 +287,8 @@ io.on("connect", function(socket) {
 	socket.once("disconnect", function() {
 		if (!! socket.name) {
 			console.log(socket.name + " logged out.");
+			numPlayers -= 1;
+			io.in("lobby").emit("playerLoggedOut", {name: socket.name});
 		}
 	});
 });
