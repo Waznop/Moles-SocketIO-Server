@@ -31,7 +31,7 @@ var minRocks = 10;
 var maxRocks = 15;
 var mapSize = 64;
 var mapDims = 8;
-var winningScore = 2; //10;
+var winningScore = 10;
 
 // roomId to room
 var rooms = {};
