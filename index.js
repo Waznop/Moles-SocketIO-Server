@@ -187,7 +187,6 @@ io.on("connect", function(socket) {
     				curPlayer.id !== socket.id &&
     				! curPlayer.underground && curPlayer.alive) {
     				players[data.roomId][i].alive = false;
-    				players[data.roomId][i].score -= 1;
     				players[data.roomId][popperIdx].score += 1;
     				io.in(data.roomId + "").emit("playerDie", {
     					id: curPlayer.id, killer: socket.id
